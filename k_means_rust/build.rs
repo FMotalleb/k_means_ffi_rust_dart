@@ -2,10 +2,13 @@ use lib_flutter_rust_bridge_codegen::{
     config_parse, frb_codegen, get_symbols_if_no_duplicates, RawOpts,
 };
 
+/// flutter_rust_bridge_codegen -r src\\lib.rs -d C:\\Users\\motalleb\\Documents\\GitHub\\rust_test\\k_means_dart\\lib\\external\\ffi_api.dart
+///
 /// Path of input Rust code
-const RUST_INPUT: &str = "src/api.rs";
+const RUST_INPUT: &str = "src\\lib.rs";
 /// Path of output generated Dart code
-const DART_OUTPUT: &str = "../dart/lib/bridge_generated.dart";
+const DART_OUTPUT: &str =
+    "C:\\Users\\motalleb\\Documents\\GitHub\\rust_test\\k_means_dart\\lib\\external\\ffi_api.dart";
 
 fn main() {
     // Tell Cargo that if the input Rust code changes, to rerun this build script.
