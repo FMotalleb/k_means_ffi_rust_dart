@@ -8,7 +8,7 @@ use lib_flutter_rust_bridge_codegen::{
 const RUST_INPUT: &str = "src\\lib.rs";
 /// Path of output generated Dart code
 const DART_OUTPUT: &str =
-    "C:\\Users\\motalleb\\Documents\\GitHub\\rust_test\\k_means_dart\\lib\\external\\ffi_api.dart";
+    "C:\\Users\\motalleb\\Documents\\GitHub\\rust_test\\k_means_flutter\\lib\\bridge_generated.dart";
 
 fn main() {
     // Tell Cargo that if the input Rust code changes, to rerun this build script.
