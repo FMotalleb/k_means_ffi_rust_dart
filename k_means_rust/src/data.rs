@@ -1,6 +1,6 @@
 #[derive(Debug, Clone)]
 #[repr(C)]
-pub struct Point {
+pub struct PointPub {
     pub x: f64,
     pub y: f64,
 }
@@ -8,6 +8,6 @@ pub struct Point {
 #[derive(Debug, Clone)]
 #[repr(C)]
 pub struct KMeansResultRow {
-    pub points: Point,
+    pub point: PointPub,
     pub source_indexes: Vec<i32>,
 }

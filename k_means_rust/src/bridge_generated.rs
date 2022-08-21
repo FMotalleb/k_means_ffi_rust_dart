@@ -16,12 +16,12 @@ use flutter_rust_bridge::*;
 // Section: imports
 
 use crate::data::KMeansResultRow;
-use crate::data::Point;
+use crate::data::PointPub;
 
 // Section: wire functions
 
 #[no_mangle]
-pub extern "C" fn wire_kmeans(port_: i64, points: *mut wire_list_point, output_count: usize) {
+pub extern "C" fn wire_kmeans(port_: i64, points: *mut wire_list_point_pub, output_count: usize) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap(
         WrapInfo {
             debug_name: "kmeans",
@@ -36,18 +36,40 @@ pub extern "C" fn wire_kmeans(port_: i64, points: *mut wire_list_point, output_c
     )
 }
 
+#[no_mangle]
+pub extern "C" fn wire_optics(
+    port_: i64,
+    points: *mut wire_list_point_pub,
+    eps: f64,
+    min_pts: usize,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "optics",
+            port: Some(port_),
+            mode: FfiCallMode::Normal,
+        },
+        move || {
+            let api_points = points.wire2api();
+            let api_eps = eps.wire2api();
+            let api_min_pts = min_pts.wire2api();
+            move |task_callback| Ok(optics(api_points, api_eps, api_min_pts))
+        },
+    )
+}
+
 // Section: wire structs
 
 #[repr(C)]
 #[derive(Clone)]
-pub struct wire_list_point {
-    ptr: *mut wire_Point,
+pub struct wire_list_point_pub {
+    ptr: *mut wire_PointPub,
     len: i32,
 }
 
 #[repr(C)]
 #[derive(Clone)]
-pub struct wire_Point {
+pub struct wire_PointPub {
     x: f64,
     y: f64,
 }
@@ -59,9 +81,9 @@ pub struct wire_Point {
 // Section: allocate functions
 
 #[no_mangle]
-pub extern "C" fn new_list_point_0(len: i32) -> *mut wire_list_point {
-    let wrap = wire_list_point {
-        ptr: support::new_leak_vec_ptr(<wire_Point>::new_with_null_ptr(), len),
+pub extern "C" fn new_list_point_pub_0(len: i32) -> *mut wire_list_point_pub {
+    let wrap = wire_list_point_pub {
+        ptr: support::new_leak_vec_ptr(<wire_PointPub>::new_with_null_ptr(), len),
         len,
     };
     support::new_leak_box_ptr(wrap)
@@ -92,8 +114,8 @@ impl Wire2Api<f64> for f64 {
     }
 }
 
-impl Wire2Api<Vec<Point>> for *mut wire_list_point {
-    fn wire2api(self) -> Vec<Point> {
+impl Wire2Api<Vec<PointPub>> for *mut wire_list_point_pub {
+    fn wire2api(self) -> Vec<PointPub> {
         let vec = unsafe {
             let wrap = support::box_from_leak_ptr(self);
             support::vec_from_leak_ptr(wrap.ptr, wrap.len)
@@ -102,9 +124,9 @@ impl Wire2Api<Vec<Point>> for *mut wire_list_point {
     }
 }
 
-impl Wire2Api<Point> for wire_Point {
-    fn wire2api(self) -> Point {
-        Point {
+impl Wire2Api<PointPub> for wire_PointPub {
+    fn wire2api(self) -> PointPub {
+        PointPub {
             x: self.x.wire2api(),
             y: self.y.wire2api(),
         }
@@ -129,7 +151,7 @@ impl<T> NewWithNullPtr for *mut T {
     }
 }
 
-impl NewWithNullPtr for wire_Point {
+impl NewWithNullPtr for wire_PointPub {
     fn new_with_null_ptr() -> Self {
         Self {
             x: Default::default(),
@@ -142,17 +164,17 @@ impl NewWithNullPtr for wire_Point {
 
 impl support::IntoDart for KMeansResultRow {
     fn into_dart(self) -> support::DartCObject {
-        vec![self.points.into_dart(), self.source_indexes.into_dart()].into_dart()
+        vec![self.point.into_dart(), self.source_indexes.into_dart()].into_dart()
     }
 }
 impl support::IntoDartExceptPrimitive for KMeansResultRow {}
 
-impl support::IntoDart for Point {
+impl support::IntoDart for PointPub {
     fn into_dart(self) -> support::DartCObject {
         vec![self.x.into_dart(), self.y.into_dart()].into_dart()
     }
 }
-impl support::IntoDartExceptPrimitive for Point {}
+impl support::IntoDartExceptPrimitive for PointPub {}
 
 // Section: executor
 
