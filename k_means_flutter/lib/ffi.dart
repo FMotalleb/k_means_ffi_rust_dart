@@ -3,9 +3,14 @@
 
 // ignore_for_file: non_constant_identifier_names
 
+import 'dart:ffi';
+
 import 'bridge_generated.dart';
 
 // Re-export the bridge so it is only necessary to import this file.
 export 'bridge_generated.dart';
 
-late final KMeansRustImpl K_MEANS_API;
+const _libName = 'lib_kmeans.so';
+final KMeansRustImpl FFI_PORTAL = KMeansRustImpl(
+  DynamicLibrary.open(_libName),
+);

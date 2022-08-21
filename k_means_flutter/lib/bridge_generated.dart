@@ -13,26 +13,34 @@ import 'dart:ffi' as ffi;
 
 abstract class KMeansRust {
   Future<List<KMeansResultRow>> kmeans(
-      {required List<Point> points, required int outputCount, dynamic hint});
+      {required List<PointPub> points, required int outputCount, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kKmeansConstMeta;
+
+  Future<List<KMeansResultRow>> optics(
+      {required List<PointPub> points,
+      required double eps,
+      required int minPts,
+      dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kOpticsConstMeta;
 }
 
 class KMeansResultRow {
-  final Point points;
+  final PointPub point;
   final Int32List sourceIndexes;
 
   KMeansResultRow({
-    required this.points,
+    required this.point,
     required this.sourceIndexes,
   });
 }
 
-class Point {
+class PointPub {
   final double x;
   final double y;
 
-  Point({
+  PointPub({
     required this.x,
     required this.y,
   });
@@ -46,12 +54,12 @@ class KMeansRustImpl extends FlutterRustBridgeBase<KMeansRustWire>
   KMeansRustImpl.raw(KMeansRustWire inner) : super(inner);
 
   Future<List<KMeansResultRow>> kmeans(
-          {required List<Point> points,
+          {required List<PointPub> points,
           required int outputCount,
           dynamic hint}) =>
       executeNormal(FlutterRustBridgeTask(
-        callFfi: (port_) => inner.wire_kmeans(
-            port_, _api2wire_list_point(points), _api2wire_usize(outputCount)),
+        callFfi: (port_) => inner.wire_kmeans(port_,
+            _api2wire_list_point_pub(points), _api2wire_usize(outputCount)),
         parseSuccessData: _wire2api_list_k_means_result_row,
         constMeta: kKmeansConstMeta,
         argValues: [points, outputCount],
@@ -64,15 +72,39 @@ class KMeansRustImpl extends FlutterRustBridgeBase<KMeansRustWire>
         argNames: ["points", "outputCount"],
       );
 
+  Future<List<KMeansResultRow>> optics(
+          {required List<PointPub> points,
+          required double eps,
+          required int minPts,
+          dynamic hint}) =>
+      executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => inner.wire_optics(
+            port_,
+            _api2wire_list_point_pub(points),
+            _api2wire_f64(eps),
+            _api2wire_usize(minPts)),
+        parseSuccessData: _wire2api_list_k_means_result_row,
+        constMeta: kOpticsConstMeta,
+        argValues: [points, eps, minPts],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kOpticsConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "optics",
+        argNames: ["points", "eps", "minPts"],
+      );
+
   // Section: api2wire
   double _api2wire_f64(double raw) {
     return raw;
   }
 
-  ffi.Pointer<wire_list_point> _api2wire_list_point(List<Point> raw) {
-    final ans = inner.new_list_point_0(raw.length);
+  ffi.Pointer<wire_list_point_pub> _api2wire_list_point_pub(
+      List<PointPub> raw) {
+    final ans = inner.new_list_point_pub_0(raw.length);
     for (var i = 0; i < raw.length; ++i) {
-      _api_fill_to_wire_point(raw[i], ans.ref.ptr[i]);
+      _api_fill_to_wire_point_pub(raw[i], ans.ref.ptr[i]);
     }
     return ans;
   }
@@ -83,7 +115,7 @@ class KMeansRustImpl extends FlutterRustBridgeBase<KMeansRustWire>
 
   // Section: api_fill_to_wire
 
-  void _api_fill_to_wire_point(Point apiObj, wire_Point wireObj) {
+  void _api_fill_to_wire_point_pub(PointPub apiObj, wire_PointPub wireObj) {
     wireObj.x = _api2wire_f64(apiObj.x);
     wireObj.y = _api2wire_f64(apiObj.y);
   }
@@ -107,7 +139,7 @@ KMeansResultRow _wire2api_k_means_result_row(dynamic raw) {
   if (arr.length != 2)
     throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
   return KMeansResultRow(
-    points: _wire2api_point(arr[0]),
+    point: _wire2api_point_pub(arr[0]),
     sourceIndexes: _wire2api_int_32_list(arr[1]),
   );
 }
@@ -116,11 +148,11 @@ List<KMeansResultRow> _wire2api_list_k_means_result_row(dynamic raw) {
   return (raw as List<dynamic>).map(_wire2api_k_means_result_row).toList();
 }
 
-Point _wire2api_point(dynamic raw) {
+PointPub _wire2api_point_pub(dynamic raw) {
   final arr = raw as List<dynamic>;
   if (arr.length != 2)
     throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-  return Point(
+  return PointPub(
     x: _wire2api_f64(arr[0]),
     y: _wire2api_f64(arr[1]),
   );
@@ -150,7 +182,7 @@ class KMeansRustWire implements FlutterRustBridgeWireBase {
 
   void wire_kmeans(
     int port_,
-    ffi.Pointer<wire_list_point> points,
+    ffi.Pointer<wire_list_point_pub> points,
     int output_count,
   ) {
     return _wire_kmeans(
@@ -162,24 +194,46 @@ class KMeansRustWire implements FlutterRustBridgeWireBase {
 
   late final _wire_kmeansPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Void Function(ffi.Int64, ffi.Pointer<wire_list_point>,
+          ffi.Void Function(ffi.Int64, ffi.Pointer<wire_list_point_pub>,
               uintptr_t)>>('wire_kmeans');
   late final _wire_kmeans = _wire_kmeansPtr
-      .asFunction<void Function(int, ffi.Pointer<wire_list_point>, int)>();
+      .asFunction<void Function(int, ffi.Pointer<wire_list_point_pub>, int)>();
 
-  ffi.Pointer<wire_list_point> new_list_point_0(
+  void wire_optics(
+    int port_,
+    ffi.Pointer<wire_list_point_pub> points,
+    double eps,
+    int min_pts,
+  ) {
+    return _wire_optics(
+      port_,
+      points,
+      eps,
+      min_pts,
+    );
+  }
+
+  late final _wire_opticsPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Int64, ffi.Pointer<wire_list_point_pub>,
+              ffi.Double, uintptr_t)>>('wire_optics');
+  late final _wire_optics = _wire_opticsPtr.asFunction<
+      void Function(int, ffi.Pointer<wire_list_point_pub>, double, int)>();
+
+  ffi.Pointer<wire_list_point_pub> new_list_point_pub_0(
     int len,
   ) {
-    return _new_list_point_0(
+    return _new_list_point_pub_0(
       len,
     );
   }
 
-  late final _new_list_point_0Ptr = _lookup<
-          ffi.NativeFunction<ffi.Pointer<wire_list_point> Function(ffi.Int32)>>(
-      'new_list_point_0');
-  late final _new_list_point_0 = _new_list_point_0Ptr
-      .asFunction<ffi.Pointer<wire_list_point> Function(int)>();
+  late final _new_list_point_pub_0Ptr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<wire_list_point_pub> Function(
+              ffi.Int32)>>('new_list_point_pub_0');
+  late final _new_list_point_pub_0 = _new_list_point_pub_0Ptr
+      .asFunction<ffi.Pointer<wire_list_point_pub> Function(int)>();
 
   void free_WireSyncReturnStruct(
     WireSyncReturnStruct val,
@@ -210,7 +264,7 @@ class KMeansRustWire implements FlutterRustBridgeWireBase {
       .asFunction<void Function(DartPostCObjectFnType)>();
 }
 
-class wire_Point extends ffi.Struct {
+class wire_PointPub extends ffi.Struct {
   @ffi.Double()
   external double x;
 
@@ -218,14 +272,14 @@ class wire_Point extends ffi.Struct {
   external double y;
 }
 
-class wire_list_point extends ffi.Struct {
-  external ffi.Pointer<wire_Point> ptr;
+class wire_list_point_pub extends ffi.Struct {
+  external ffi.Pointer<wire_PointPub> ptr;
 
   @ffi.Int32()
   external int len;
 }
 
-typedef uintptr_t = ffi.UnsignedLongLong;
+typedef uintptr_t = ffi.UnsignedLong;
 typedef DartPostCObjectFnType = ffi.Pointer<
     ffi.NativeFunction<ffi.Bool Function(DartPort, ffi.Pointer<ffi.Void>)>>;
 typedef DartPort = ffi.Int64;
