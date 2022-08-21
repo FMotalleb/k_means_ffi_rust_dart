@@ -16,9 +16,9 @@ project(${PROJECT_NAME} LANGUAGES CXX)
 # This list could contain prebuilt libraries, or libraries created by an
 # external build triggered from this build file.
 # set(clustering_flutter_bundled_libraries
-#   # Defined in ../src/CMakeLists.txt.
-#   # This can be changed to accomodate different builds.
-#   $<TARGET_FILE:clustering_flutter>
-#   PARENT_SCOPE
+# # Defined in ../src/CMakeLists.txt.
+# # This can be changed to accomodate different builds.
+# $<TARGET_FILE:clustering_flutter>
+# PARENT_SCOPE
 # )
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../libs/lib_ffi_clustering.so DESTINATION lib ${INSTALL_BUNDLE_LIB_DIR} COMPONENT Runtime)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../libs/widndows_x86-64/lib_ffi_clustering.so DESTINATION lib ${INSTALL_BUNDLE_LIB_DIR} COMPONENT Runtime)

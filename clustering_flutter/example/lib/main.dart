@@ -23,7 +23,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     final testData = List.generate(150, (index) => Point(x: index.toDouble(), y: index.toDouble()));
-    clustering_flutter.ClusteringFFI.kmeansClustering(testData, 3).then(
+    clustering_flutter.ClusteringFFI.kmeans(testData, 3).then(
       (value) => print(value),
     );
   }
