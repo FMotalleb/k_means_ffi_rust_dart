@@ -1,3 +1,0 @@
-[target.i686-linux-android] 
-ar = "C:/Users/motalleb/Documents/GitHub/rust_test/k_means_rust/NDK/x86/bin/i686-linux-android-ar.cmd"
-linker = "C:/Users/motalleb/Documents/GitHub/rust_test/k_means_rust/NDK/x86/bin/i686-linux-android-clang.cmd"
